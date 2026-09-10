@@ -3,8 +3,9 @@ import { axiosInstance } from "../lib/axios.js";
 import { io } from "socket.io-client";
 import { useChatStore } from "./useChatStore.js"; // 👈 استدعاء useChatStore
 import toast from "react-hot-toast";
-const baseURL =
-  import.meta.env.MODE === "development" ? "http://localhost:3000" : "/";
+// const baseURL =
+// import.meta.env.MODE === "development" ? "http://localhost:3000" : "/";
+const baseURL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
 
 export const useAuthStore = create((set, get) => ({
   authUser: null,
@@ -62,7 +63,6 @@ export const useAuthStore = create((set, get) => ({
       useChatStore.getState().updateUserLastSeen?.(userId, lastSeen);
     });
   },
-
 
   disconnectSocket: () => {
     const socket = get().socket;
