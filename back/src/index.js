@@ -91,17 +91,6 @@
 //   if (process.env.NODE_ENV === "production") job.start();
 // });
 
-
-
-
-
-
-
-
-
-
-
-
 // import "dotenv/config"; // يُستدعى في أول السطر لضمان تحميل المتغيرات فوراً
 
 // import express from "express";
@@ -121,7 +110,6 @@
 
 // const PORT = process.env.PORT || 3000;
 // // const FRONT_END_URL = process.env.FRONT_END_URL || "http://localhost:5173";
-
 
 // // const FRONT_END_URL =
 // //   process.env.NODE_ENV === "production"
@@ -174,12 +162,6 @@
 //   if (process.env.NODE_ENV === "production") job.start();
 // });
 
-
-
-
-
-
-
 import "dotenv/config";
 import express from "express";
 import cors from "cors";
@@ -203,9 +185,32 @@ app.use(
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ limit: "10mb", extended: true }));
 
+// app.use(
+//   cors({
+//     origin: ["https://dark-mo-o1.vercel.app", "http://localhost:5173"],
+//     credentials: true,
+//   }),
+// );
+
 app.use(
   cors({
-    origin: ["https://dark-mo-o1.vercel.app", "http://localhost:5173"],
+    origin: function (origin, callback) {
+      // السماح بأي طلب جاي من Vercel أو localhost أثناء التطور
+      const allowedOrigins = [
+        "https://dark-mo-o1.vercel.app",
+        "http://localhost:5173",
+      ];
+      // السماح لو الطلب من نفس الدومين أو مفيش origin (زي Postman أو سيرفر داخلي)
+      if (
+        !origin ||
+        allowedOrigins.includes(origin) ||
+        origin.endsWith(".vercel.app")
+      ) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
   }),
 );
