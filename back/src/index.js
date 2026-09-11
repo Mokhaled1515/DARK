@@ -230,5 +230,5 @@ server.listen(PORT, () => {
   cnnectDB();
   console.log("Server is up and running on PORT", PORT);
 
-  if (process.env.NODE_ENV === "production") job.start();
+  // if (process.env.NODE_ENV === "production") job.start();
 });
