@@ -267,17 +267,97 @@ function ChatSidebar() {
       setLoadingUserId(null);
     }
   };
-  const handleSelectFriend = async (userId) => {
-    try {
-      const chatStore = useChatStore.getState();
+  // const handleSelectFriend = async (userId) => {
+  //   try {
+  //     const chatStore = useChatStore.getState();
 
+  //     await chatStore.openChatWithUser({
+  //       _id: userId,
+  //     });
+  //   } catch (error) {
+  //     console.error("Failed to open chat:", error);
+  //   }
+  // };
+
+//   const handleSelectFriend = async (userId) => {
+//   try {
+//     const chatStore = useChatStore.getState();
+
+//     const conversation = chatStore.conversations.find(
+//       (conv) =>
+//         String(
+//           conv?.peer?._id ||
+//             conv?.recipient?._id ||
+//             conv?.user?._id ||
+//             conv?.userId
+//         ) === String(userId)
+//     );
+
+//     if (conversation) {
+//       await chatStore.openConversation(conversation);
+//     } else {
+//       await chatStore.openChatWithUser({
+//         _id: userId,
+//       });
+//     }
+//   } catch (error) {
+//     console.error("Failed to open chat:", error);
+//   }
+// };
+
+// const handleSelectFriend = async (userId) => {
+//   try {
+//     const chatStore = useChatStore.getState();
+
+//     const conversation = chatStore.conversations.find(
+//       (conv) =>
+//         String(
+//           conv?.peer?._id ||
+//             conv?.recipient?._id ||
+//             conv?.user?._id ||
+//             conv?.userId,
+//         ) === String(userId),
+//     );
+
+//     if (conversation) {
+//       await chatStore.openConversation(conversation);
+//     } else {
+//       await chatStore.openChatWithUser({
+//         _id: userId,
+//       });
+//     }
+//   } catch (error) {
+//     console.error("Failed to open chat:", error);
+//   }
+// };
+
+
+const handleSelectFriend = async (userId) => {
+  try {
+    const chatStore = useChatStore.getState();
+
+    const conversation = chatStore.conversations.find(
+      (conv) =>
+        String(
+          conv?.peer?._id ||
+            conv?.recipient?._id ||
+            conv?.user?._id ||
+            conv?.userId,
+        ) === String(userId),
+    );
+
+    if (conversation) {
+      await chatStore.openConversation(conversation);
+    } else {
       await chatStore.openChatWithUser({
         _id: userId,
       });
-    } catch (error) {
-      console.error("Failed to open chat:", error);
     }
-  };
+  } catch (error) {
+    console.error("Failed to open chat:", error);
+  }
+};
+
 
   const handleAcceptRequest = async (req) => {
     try {
@@ -397,21 +477,7 @@ function ChatSidebar() {
                 key={conversation.id}
                 user={conversation}
                 selected={conversation.id === activeConversationId}
-                // onSelect={() => {
-                //   setActiveConversationId(conversation.id);
-                //   markMessagesAsRead(conversation.id);
-                // }}
-                // onSelect={async () => {
-                //   const chatStore = useChatStore.getState();
-
-                //   await chatStore.openConversation(conversation);
-
-                //   await chatStore.getMessages(conversation.conversationId);
-
-                //   await chatStore.markMessagesAsRead(
-                //     conversation.conversationId,
-                //   );
-                // }}
+             
 
                 onSelect={async () => {
                   const chatStore = useChatStore.getState();

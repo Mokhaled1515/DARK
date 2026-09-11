@@ -59,60 +59,6 @@ export async function sendFriendRequest(req, res) {
   }
 }
 
-// export async function acceptFriendRequest(req, res) {
-//   try {
-//     const { requestId } = req.params;
-//     const userId = req.user._id;
-
-//     const request = await FriendRequest.findById(requestId);
-//     if (!request || request.receiver.toString() !== userId.toString()) {
-//       return res.status(404).json({ message: "Request not found" });
-//     }
-
-//     await User.findByIdAndUpdate(request.sender, {
-//       $addToSet: { friends: request.receiver },
-//     });
-
-//     // بيانات الشخص الذي قَبَل الطلب (هتروح للي باعت كصديق له)
-//     const receiverUser = await User.findById(request.receiver).select(
-//       "-clerkId",
-//     );
-
-//     // بيانات الشخص الذي أرسل الطلب في الأساس (عشان لما تقبل يظهر عندك كصديق)
-//     const senderUser = await User.findById(request.sender).select("-clerkId");
-
-//     const welcomeMsg = await Message.create({
-//       senderId: request.receiver,
-//       receiverId: request.sender,
-//       text: `Hello! I accepted your friend request. Let's chat! 👋`,
-//     });
-
-//     await FriendRequest.findByIdAndDelete(requestId);
-
-//     const senderSocketId = getReceiverSocketId(request.sender);
-//     if (senderSocketId) {
-//       io.to(senderSocketId).emit("friendRequestAccepted", {
-//         welcomeMsg,
-//         friend: receiverUser, // 👈 الشخص اللي قبل الطلب (بالنسبة للـ sender هو ده الصديق الجديد اللي هيفتحه)
-//       });
-//     }
-
-//     res.status(200).json({
-//       message: "Friend request accepted successfully",
-//       welcomeMsg,
-//       friend: senderUser, // 👈 الشخص اللي كان باعت الطلب (بالنسبة للي قَبَل هو ده الصديق الجديد)
-//     });
-//   } catch (error) {
-//     res.status(500).json({ message: error.message });
-//   }
-// }
-
-// import User from "../models/User.js";
-// import FriendRequest from "../models/FriendRequest.js";
-// import Message from "../models/Messege.js";
-// import Conversation from "../models/Conversation.js";
-// import { getReceiverSocketId, io } from "../lib/socket.js";
-
 export async function acceptFriendRequest(req, res) {
   try {
     const { requestId } = req.params;
@@ -165,31 +111,6 @@ export async function acceptFriendRequest(req, res) {
       });
     }
 
-    // // 5. Create welcome message
-    // // const welcomeMsg = await Message.create({
-    // //   senderId: receiverId,
-    // //   receiverId: senderId,
-    // //   text: "Hello! I accepted your friend request. Let's chat! 👋",
-    // // });
-
-    // // 6. Update conversation with the welcome message
-    // // conversation.lastMessage = {
-    // //   text: "Hello! I accepted your friend request. Let's chat! 👋",
-    // //   sender: receiverId,
-    // // };
-
-    // // The sender receives the welcome message as unread
-    // const currentUnread =
-    //   conversation.unreadCounts.get(senderId.toString()) || 0;
-
-    // conversation.unreadCounts.set(
-    //   senderId.toString(),
-    //   currentUnread + 1
-    // );
-
-    // await conversation.save();
-
-    // 5. Create welcome message
     const welcomeText = "Hello! I accepted your friend request. Let's chat! 👋";
 
     await Message.create({
@@ -198,13 +119,11 @@ export async function acceptFriendRequest(req, res) {
       text: welcomeText,
     });
 
-    // 6. Update conversation with the welcome message
     conversation.lastMessage = {
       text: welcomeText,
       sender: receiverId,
     };
 
-    // The sender receives the welcome message as unread
     const currentUnread =
       conversation.unreadCounts.get(senderId.toString()) || 0;
 
@@ -213,10 +132,6 @@ export async function acceptFriendRequest(req, res) {
     await conversation.save();
     // 7. Delete friend request
     await FriendRequest.findByIdAndDelete(requestId);
-
-    // ==========================================
-    // 8. Notify Mohamed (sender)
-    // ==========================================
 
     const senderSocketId = getReceiverSocketId(senderId.toString());
 
@@ -233,10 +148,6 @@ export async function acceptFriendRequest(req, res) {
       });
     }
 
-    // ==========================================
-    // 9. Notify Ahmed (receiver)
-    // ==========================================
-
     const receiverSocketId = getReceiverSocketId(receiverId.toString());
 
     if (receiverSocketId) {
@@ -252,7 +163,6 @@ export async function acceptFriendRequest(req, res) {
       });
     }
 
-    // 10. Response to Ahmed
     return res.status(200).json({
       message: "Friend request accepted successfully",
       welcomeMsg: welcomeText,
@@ -288,27 +198,6 @@ export async function getPendingRequests(req, res) {
   }
 }
 
-// export async function rejectFriendRequest(req, res) {
-//   try {
-//     const { requestId } = req.params;
-//     const userId = req.user._id;
-
-//     const request = await FriendRequest.findById(requestId);
-
-//     if (!request || request.receiver.toString() !== userId.toString()) {
-//       return res
-//         .status(404)
-//         .json({ message: "Request not found or unauthorized" });
-//     }
-
-//     await FriendRequest.findByIdAndDelete(requestId);
-
-//     res.status(200).json({ message: "Friend request rejected successfully" });
-//   } catch (error) {
-//     console.error("Error in rejectFriendRequest:", error.message);
-//     res.status(500).json({ message: "Internal server error" });
-//   }
-// }
 export async function rejectFriendRequest(req, res) {
   try {
     const { requestId } = req.params;
@@ -322,20 +211,13 @@ export async function rejectFriendRequest(req, res) {
       });
     }
 
-    // الشخص الذي أرسل طلب الصداقة
     const senderId = request.sender;
 
-    // الشخص الذي رفض الطلب
     const receiverUser = await User.findById(userId).select(
       "fullName profilePic email",
     );
 
-    // حذف الطلب من MongoDB
     await FriendRequest.findByIdAndDelete(requestId);
-
-    // ==========================================
-    // Notify sender that his request was rejected
-    // ==========================================
 
     const senderSocketId = getReceiverSocketId(senderId.toString());
 
