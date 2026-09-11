@@ -6,7 +6,7 @@ import toast from "react-hot-toast";
 // const baseURL =
 // import.meta.env.MODE === "development" ? "http://localhost:3000" : "/";
 const baseURL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
-
+// force rebuild
 export const useAuthStore = create((set, get) => ({
   authUser: null,
   isCheckingAuth: true,
