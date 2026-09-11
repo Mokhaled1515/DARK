@@ -8,31 +8,38 @@ const app = express();
 const server = http.createServer(app);
 
 // const allowedOrigins = [
-//   // process.env.FRONT_END_URL || "https://DARKii.vercel.app",
-//   // "http://localhost:5173",
-//   // "http://localhost:3000",
+//   process.env.FRONT_END_URL,
 //   "https://dark-mo-01.vercel.app",
 //   "http://localhost:5173",
 //   "http://localhost:3000",
-// ];
-// console.log("Allowed CORS origins:", allowedOrigins);
+// ].filter(Boolean);
 
-const allowedOrigins = [
-  process.env.FRONT_END_URL,
-  "https://dark-mo-01.vercel.app",
-  "http://localhost:5173",
-  "http://localhost:3000",
-].filter(Boolean);
-
-console.log("Allowed origins:", allowedOrigins);
+// console.log("Allowed origins:", allowedOrigins);
 
 // const io = new Server(server, {
 //   cors: {
-//     origin: allowedOrigins,
+//     origin: (origin, callback) => {
+//       console.log("Incoming origin:", origin);
+
+//       if (!origin || allowedOrigins.includes(origin)) {
+//         callback(null, true);
+//       } else {
+//         console.log("❌ CORS rejected:", origin);
+//         callback(new Error("Not allowed by CORS"));
+//       }
+//     },
 //     methods: ["GET", "POST"],
 //     credentials: true,
 //   },
 // });
+
+const allowedOrigins = [
+  "https://dark-mo-o1.vercel.app",
+  "http://localhost:5173",
+  "http://localhost:3000",
+];
+
+console.log("Allowed origins:", allowedOrigins);
 
 const io = new Server(server, {
   cors: {
@@ -43,7 +50,7 @@ const io = new Server(server, {
         callback(null, true);
       } else {
         console.log("❌ CORS rejected:", origin);
-        callback(new Error("Not allowed by CORS"));
+        callback(new Error(`Not allowed by CORS: ${origin}`));
       }
     },
     methods: ["GET", "POST"],
