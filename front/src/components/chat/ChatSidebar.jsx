@@ -398,11 +398,11 @@ function ChatSidebar() {
               {pendingRequests.length > 0 && (
                 <span
                   className="
-      absolute -top-1.5 -right-1.5
+      absolute -top-3 -right-3
       flex h-5 min-w-5
       items-center justify-center
       rounded-full
-      bg-red-500
+      bg-green-500
       px-1
       text-[10px]
       font-bold
