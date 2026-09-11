@@ -380,15 +380,38 @@ function ChatSidebar() {
               <UsersIcon className="size-3.5 opacity-80" aria-hidden />
               Friends
             </Tabs.Tab>
-            <Tabs.Tab
+            {/* <Tabs.Tab
               id="add"
               className="flex-1 justify-center gap-1.5 relative"
+            > */}
+            <Tabs.Tab
+              id="add"
+              className="relative flex-1 justify-center gap-1.5"
             >
               <UserPlusIcon className="size-3.5 opacity-80" aria-hidden />
               Add
-              {pendingRequests.length > 0 && (
+              {/* {pendingRequests.length > 0 && (
                 <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] text-white font-bold">
                   {pendingRequests.length}
+                </span>
+              )} */}
+              {pendingRequests.length > 0 && (
+                <span
+                  className="
+      absolute -top-1.5 -right-1.5
+      flex h-5 min-w-5
+      items-center justify-center
+      rounded-full
+      bg-red-500
+      px-1
+      text-[10px]
+      font-bold
+      leading-none
+      text-white
+      shadow-sm
+    "
+                >
+                  {pendingRequests.length > 99 ? "99+" : pendingRequests.length}
                 </span>
               )}
             </Tabs.Tab>
