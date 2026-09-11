@@ -95,13 +95,29 @@ function ChatSidebar() {
     (state) => state.setActiveConversationId,
   );
 
-  // const onlineUsers = useAuthAuthStoreSelector
+  // // const onlineUsers = useAuthAuthStoreSelector
+  // const onlineUsers = useAuthStore((state) => state.onlineUsers);
+  // const authUser = useAuthStore((state) => state.authUser);
   const onlineUsers = useAuthStore((state) => state.onlineUsers);
   const authUser = useAuthStore((state) => state.authUser);
+  const socket = useAuthStore((state) => state.socket);
 
   const friends = useFriendStore((state) => state.friends);
+  // const pendingRequests = useFriendStore((state) => state.pendingRequests);
+  // const searchResults = useFriendStore((state) => state.searchResults);
   const pendingRequests = useFriendStore((state) => state.pendingRequests);
+  const getPendingRequests = useFriendStore(
+    (state) => state.getPendingRequests,
+  );
+  const subscribeToFriendEvents = useFriendStore(
+    (state) => state.subscribeToFriendEvents,
+  );
+  const unsubscribeFromFriendEvents = useFriendStore(
+    (state) => state.unsubscribeFromFriendEvents,
+  );
+
   const searchResults = useFriendStore((state) => state.searchResults);
+
   const searchUsers = useFriendStore((state) => state.searchUsers);
   const sendFriendRequest = useFriendStore((state) => state.sendFriendRequest);
   const rejectFriendRequest = useFriendStore(
@@ -117,23 +133,94 @@ function ChatSidebar() {
 
   const { activeConversationId, isLargeScreen } = useSelectedConversation();
 
+  // useEffect(() => {
+  //   const currentUserId = authUser?._id || authUser?.id;
+  //   if (currentUserId) {
+  //     getConversations();
+  //     getUsers();
+  //     subscribeToMessages(currentUserId);
+  //   }
+
+  //   return () => {
+  //     unsubscribeFromMessages();
+  //   };
+  // }, [
+  //   authUser,
+  //   getConversations,
+  //   getUsers,
+  //   subscribeToMessages,
+  //   unsubscribeFromMessages,
+  // ]);
+
+  // useEffect(() => {
+  //   const currentUserId = authUser?._id || authUser?.id;
+
+  //   if (!currentUserId) return;
+
+  //   // ==============================
+  //   // CHAT
+  //   // ==============================
+  //   getConversations();
+  //   getUsers();
+  //   subscribeToMessages();
+
+  //   // ==============================
+  //   // FRIEND REQUESTS
+  //   // ==============================
+  //   getPendingRequests();
+  //   subscribeToFriendEvents();
+
+  //   return () => {
+  //     unsubscribeFromMessages();
+  //     unsubscribeFromFriendEvents();
+  //   };
+  // }, [
+  //   authUser,
+  //   getConversations,
+  //   getUsers,
+  //   subscribeToMessages,
+  //   unsubscribeFromMessages,
+  //   getPendingRequests,
+  //   subscribeToFriendEvents,
+  //   unsubscribeFromFriendEvents,
+  // ]);
+
   useEffect(() => {
     const currentUserId = authUser?._id || authUser?.id;
-    if (currentUserId) {
-      getConversations();
-      getUsers();
-      subscribeToMessages(currentUserId);
-    }
+
+    if (!currentUserId || !socket) return;
+
+    // ==============================
+    // CHAT DATA
+    // ==============================
+    getConversations();
+    getUsers();
+
+    // ==============================
+    // FRIEND REQUESTS
+    // ==============================
+    getPendingRequests();
+
+    // ==============================
+    // SOCKET EVENTS
+    // ==============================
+    subscribeToMessages();
+    subscribeToFriendEvents();
 
     return () => {
       unsubscribeFromMessages();
+      unsubscribeFromFriendEvents();
     };
   }, [
     authUser,
+    socket,
     getConversations,
     getUsers,
+    getPendingRequests,
     subscribeToMessages,
     unsubscribeFromMessages,
+    subscribeToFriendEvents,
+    unsubscribeFromFriendEvents,
   ]);
 
   const currentUserId = authUser?._id || authUser?.id;
@@ -168,96 +255,6 @@ function ChatSidebar() {
     }
   };
 
-  // const handleSendRequest = async (userId) => {
-  //   try {
-  //     setLoadingUserId(userId);
-  //     await sendFriendRequest(userId);
-  //     setSentRequests((prev) => [...prev, userId]);
-  //   } catch (error) {
-  //     console.error("Failed to send request", error);
-  //   } finally {
-  //     setLoadingUserId(null);
-  //   }
-  // };
-
-  // const handleSelectFriend = async (userId) => {
-  //   try {
-  //     let targetConversationId = userId;
-
-  //     if (typeof accessConversation === "function") {
-  //       const conv = await accessConversation(userId);
-  //       targetConversationId =
-  //         conv?._id || conv?.id || conv?.conversation?._id || userId;
-  //     }
-
-  //     await getConversations();
-  //     setSidebarTab("chats");
-  //     setActiveConversationId(targetConversationId);
-  //     markMessagesAsRead(targetConversationId);
-  //   } catch (error) {
-  //     console.error("Failed to start conversation with friend", error);
-  //     setSidebarTab("chats");
-  //     setActiveConversationId(userId);
-  //   }
-  // };
-
-  // const handleAcceptRequest = async (req) => {
-  //   try {
-  //     const senderId = req.sender?._id || req.sender?.id;
-  //     if (!senderId) return;
-
-  //     await acceptFriendRequest(req._id);
-
-  //     let targetId = senderId;
-  //     if (typeof accessConversation === "function") {
-  //       const conv = await accessConversation(senderId);
-  //       targetId =
-  //         conv?._id ||
-  //         conv?.id ||
-  //         conv?.conversation?._id ||
-  //         senderId;
-  //     }
-
-  //     // تحديث القوائم من السيرفر
-  //     await getConversations();
-  //     await getUsers();
-
-  //     // لو السيرفر مجابش المحادثة في الستيت، بنحقنها غصب عنها عشان تظهر في الـ Chats فوراً
-  //     const currentConversations = useChatStore.getState().conversations;
-  //     const existingConv = currentConversations.find(
-  //       (c) =>
-  //         String(c.peer?._id || c._id || c.recipient?._id) === String(senderId) ||
-  //         String(c._id) === String(targetId),
-  //     );
-
-  //     if (!existingConv) {
-  //       const newFakeConv = {
-  //         _id: targetId,
-  //         peer: {
-  //           _id: senderId,
-  //           fullName: req.sender?.fullName,
-  //           name: req.sender?.fullName,
-  //           profilePic: req.sender?.profilePic,
-  //         },
-  //         lastMessage: "Say hi to your new friend!",
-  //       };
-  //       useChatStore.setState((state) => ({
-  //         conversations: [newFakeConv, ...state.conversations],
-  //       }));
-  //     }
-
-  //     setSidebarTab("chats");
-  //     setActiveConversationId(targetId);
-
-  //     const getMessages = useChatStore.getState().getMessages;
-  //     if (typeof getMessages === "function") {
-  //       await getMessages(targetId);
-  //     }
-  //     markMessagesAsRead(targetId);
-  //   } catch (error) {
-  //     console.error("Error accepting friend request or opening chat:", error);
-  //   }
-  // };
   const handleSendRequest = async (userId) => {
     setLoadingUserId(userId);
 
@@ -267,97 +264,32 @@ function ChatSidebar() {
       setLoadingUserId(null);
     }
   };
-  // const handleSelectFriend = async (userId) => {
-  //   try {
-  //     const chatStore = useChatStore.getState();
 
-  //     await chatStore.openChatWithUser({
-  //       _id: userId,
-  //     });
-  //   } catch (error) {
-  //     console.error("Failed to open chat:", error);
-  //   }
-  // };
+  const handleSelectFriend = async (userId) => {
+    try {
+      const chatStore = useChatStore.getState();
 
-//   const handleSelectFriend = async (userId) => {
-//   try {
-//     const chatStore = useChatStore.getState();
+      const conversation = chatStore.conversations.find(
+        (conv) =>
+          String(
+            conv?.peer?._id ||
+              conv?.recipient?._id ||
+              conv?.user?._id ||
+              conv?.userId,
+          ) === String(userId),
+      );
 
-//     const conversation = chatStore.conversations.find(
-//       (conv) =>
-//         String(
-//           conv?.peer?._id ||
-//             conv?.recipient?._id ||
-//             conv?.user?._id ||
-//             conv?.userId
-//         ) === String(userId)
-//     );
-
-//     if (conversation) {
-//       await chatStore.openConversation(conversation);
-//     } else {
-//       await chatStore.openChatWithUser({
-//         _id: userId,
-//       });
-//     }
-//   } catch (error) {
-//     console.error("Failed to open chat:", error);
-//   }
-// };
-
-// const handleSelectFriend = async (userId) => {
-//   try {
-//     const chatStore = useChatStore.getState();
-
-//     const conversation = chatStore.conversations.find(
-//       (conv) =>
-//         String(
-//           conv?.peer?._id ||
-//             conv?.recipient?._id ||
-//             conv?.user?._id ||
-//             conv?.userId,
-//         ) === String(userId),
-//     );
-
-//     if (conversation) {
-//       await chatStore.openConversation(conversation);
-//     } else {
-//       await chatStore.openChatWithUser({
-//         _id: userId,
-//       });
-//     }
-//   } catch (error) {
-//     console.error("Failed to open chat:", error);
-//   }
-// };
-
-
-const handleSelectFriend = async (userId) => {
-  try {
-    const chatStore = useChatStore.getState();
-
-    const conversation = chatStore.conversations.find(
-      (conv) =>
-        String(
-          conv?.peer?._id ||
-            conv?.recipient?._id ||
-            conv?.user?._id ||
-            conv?.userId,
-        ) === String(userId),
-    );
-
-    if (conversation) {
-      await chatStore.openConversation(conversation);
-    } else {
-      await chatStore.openChatWithUser({
-        _id: userId,
-      });
+      if (conversation) {
+        await chatStore.openConversation(conversation);
+      } else {
+        await chatStore.openChatWithUser({
+          _id: userId,
+        });
+      }
+    } catch (error) {
+      console.error("Failed to open chat:", error);
     }
-  } catch (error) {
-    console.error("Failed to open chat:", error);
-  }
-};
-
+  };
 
   const handleAcceptRequest = async (req) => {
     try {
@@ -477,8 +409,6 @@ const handleSelectFriend = async (userId) => {
                 key={conversation.id}
                 user={conversation}
                 selected={conversation.id === activeConversationId}
-             
-
                 onSelect={async () => {
                   const chatStore = useChatStore.getState();
                   await chatStore.openConversation(conversation);
