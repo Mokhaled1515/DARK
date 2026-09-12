@@ -77,10 +77,10 @@ export const WALLPAPERS = [
     url: "/wallparers/ventura-light.jpg",
   },
   {
-    id: "ventura-DARK — Real-Time Chat Application",
+    id: "ventura-dark",
     category: "abstract",
-    label: "Ventura DARK — Real-Time Chat Application",
-    url: "/wallparers/ventura-DARK — Real-Time Chat Application.jpg",
+    label: "Ventura Dark",
+    url: "/wallparers/ventura-dark.jpg",
   },
 ];
 

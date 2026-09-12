@@ -2,10 +2,10 @@
 @import "@heroui/styles";
 @import "./styles/heroui-theme-preset.css";
 
-/* HeroUI's DARK — Real-Time Chat Application fallback uses prefers-color-scheme but forgot [data-theme="light"], so OS DARK — Real-Time Chat Application +
-   app light still applied DARK — Real-Time Chat Application: utilities. Re-define so explicit light theme wins system DARK — Real-Time Chat Application. */
-@custom-variant DARK — Real-Time Chat Application {
-  &:is(.DARK — Real-Time Chat Application, .DARK — Real-Time Chat Application *, [data-theme="DARK — Real-Time Chat Application"], [data-theme="DARK — Real-Time Chat Application"] *) {
+/* HeroUI's dark fallback uses prefers-color-scheme but forgot [data-theme="light"], so OS dark +
+   app light still applied dark: utilities. Re-define so explicit light theme wins system dark. */
+@custom-variant dark {
+  &:is(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *) {
     @slot;
 
     &::before,
@@ -14,13 +14,13 @@
     }
   }
 
-  @media (prefers-color-scheme: DARK — Real-Time Chat Application) {
+  @media (prefers-color-scheme: dark) {
     &:not(
         :is(
-          .DARK — Real-Time Chat Application,
-          .DARK — Real-Time Chat Application *,
-          [data-theme="DARK — Real-Time Chat Application"],
-          [data-theme="DARK — Real-Time Chat Application"] *,
+          .dark,
+          .dark *,
+          [data-theme="dark"],
+          [data-theme="dark"] *,
           [data-theme="light"],
           [data-theme="light"] *
         )

@@ -17,9 +17,9 @@ export function ThemeToggle() {
       </Button>
       <Button
         size="sm"
-        variant={theme === "DARK — Real-Time Chat Application" ? "primary" : "ghost"}
+        variant={theme === "dark" ? "primary" : "ghost"}
         isIconOnly
-        onPress={() => setTheme("DARK — Real-Time Chat Application")}
+        onPress={() => setTheme("dark")}
       >
         <Moon className="size-4" />
       </Button>

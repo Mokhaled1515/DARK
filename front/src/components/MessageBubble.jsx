@@ -296,7 +296,7 @@ function MessageBubble({ message, onImageClick }) {
           )}
 
           {audioSource && (
-            <div className="mt-2 flex items-center gap-2 w-full bg-black/10 DARK — Real-Time Chat Application:bg-white/10 px-3.5 py-2.5 rounded-xl backdrop-blur-sm">
+            <div className="mt-2 flex items-center gap-2 w-full bg-black/10 dark:bg-white/10 px-3.5 py-2.5 rounded-xl backdrop-blur-sm">
               <button
                 type="button"
                 onClick={togglePlayAudio}

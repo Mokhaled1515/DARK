@@ -588,7 +588,7 @@ export const useChatStore = create(
     }),
 
     {
-      name: "DARK — Real-Time Chat Application-chat-storage",
+      name: "DARK-chat-storage",
 
       partialize: (state) => ({
         isSoundEnabled: state.isSoundEnabled,
