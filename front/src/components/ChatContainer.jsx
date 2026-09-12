@@ -80,7 +80,7 @@ function ChatContainer() {
       <div className="flex flex-1 items-center justify-center p-4 text-center">
         <div>
           <h2 className="text-lg font-semibold text-foreground">
-            WELCOME IN DARK
+            WELCOME IN DARK — Real-Time Chat Application
           </h2>
 
           <p className="mt-1 text-sm text-muted">

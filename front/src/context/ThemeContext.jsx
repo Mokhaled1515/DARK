@@ -4,20 +4,20 @@ import { applyThemePresetToDocument, isValidThemePreset, ThemeContext } from "./
 
 function getSystemTheme() {
   if (typeof window === "undefined") return "light";
-  return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+  return window.matchMedia("(prefers-color-scheme: DARK — Real-Time Chat Application)").matches ? "DARK — Real-Time Chat Application" : "light";
 }
 
 function readStoredTheme() {
   const theme = localStorage.getItem("theme");
-  if (theme === "light" || theme === "dark") return theme;
+  if (theme === "light" || theme === "DARK — Real-Time Chat Application") return theme;
 
   return null;
 }
 
 function applyDomTheme(theme) {
   const root = document.documentElement;
-  root.classList.toggle("dark", theme === "dark");
-  root.setAttribute("data-theme", theme === "dark" ? "dark" : "light");
+  root.classList.toggle("DARK — Real-Time Chat Application", theme === "DARK — Real-Time Chat Application");
+  root.setAttribute("data-theme", theme === "DARK — Real-Time Chat Application" ? "DARK — Real-Time Chat Application" : "light");
 }
 
 function readStoredThemePreset() {
@@ -47,7 +47,7 @@ export function ThemeProvider({ children }) {
   const setTheme = (next) => setThemeState(next);
 
   const toggleTheme = () => {
-    setThemeState((t) => (t === "dark" ? "light" : "dark"));
+    setThemeState((t) => (t === "DARK — Real-Time Chat Application" ? "light" : "DARK — Real-Time Chat Application"));
   };
 
   const setThemePreset = (next) => {

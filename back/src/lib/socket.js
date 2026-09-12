@@ -9,7 +9,7 @@ const server = http.createServer(app);
 
 
 const allowedOrigins = [
-  "https://dark-mo-o1.vercel.app",
+  "https://DARK — Real-Time Chat Application-mo-o1.vercel.app",
   "http://localhost:5173",
   "http://localhost:3000",
 ];

@@ -1,4 +1,4 @@
-# DARK - Real-Time Chat Application
+# DARK — Real-Time Chat Application - Real-Time Chat Application
 
 A full-stack real-time chat application built with modern technologies to provide a seamless messaging experience, friend management, and efficient media sharing.
 
@@ -6,7 +6,7 @@ A full-stack real-time chat application built with modern technologies to provid
 * **Real-Time Chat:** Send and receive messages instantly.
 * **Friend System:** Send, accept, and manage friend requests effortlessly.
 * **Media Sharing:** Support for image uploads and media handling via Cloudinary.
-* **Modern UI:** Clean design with a responsive dark mode interface optimized for all screens.
+* **Modern UI:** Clean design with a responsive DARK — Real-Time Chat Application mode interface optimized for all screens.
 
 ## 🛠️ Tech Stack
 * **Frontend:** React, Vite, Tailwind CSS, HeroUI / NextUI, Zustand
@@ -16,6 +16,6 @@ A full-stack real-time chat application built with modern technologies to provid
 
 ## ⚙️ Project Structure
 ```text
-DARK/
+DARK — Real-Time Chat Application/
 ├── backend/   # Node.js, Express, and JavaScript server
 └── frontend/  # React and Vite user interface

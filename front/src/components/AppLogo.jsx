@@ -1,4 +1,4 @@
-export const APP_NAME = "DARK";
+export const APP_NAME = "DARK — Real-Time Chat Application";
 
 export function AppLogo({ className = "", size = 32, alt = APP_NAME }) {
   return (

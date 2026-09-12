@@ -241,7 +241,7 @@ function MessageInput({ conversationId }) {
             }}
             className="shadow-2xl"
           >
-            <EmojiPicker theme="dark" onEmojiClick={handleEmojiClick} />
+            <EmojiPicker theme="DARK — Real-Time Chat Application" onEmojiClick={handleEmojiClick} />
           </div>,
           document.body,
         )}
@@ -341,7 +341,7 @@ function MessageInput({ conversationId }) {
               onChange={handleInputChange}
               onKeyDown={handleKeyDown}
               onFocus={() => setShowEmojiPicker(false)}
-              placeholder="DARK..."
+              placeholder="DARK — Real-Time Chat"
               rows={1}
               disabled={!!audioBlob}
               className="max-h-32 selection:text-emerald-400 selection:bg-emerald-600/20 min-h-10 w-full resize-none bg-transparent px-4 py-2.5 pr-10 text-sm text-foreground outline-none disabled:opacity-50"

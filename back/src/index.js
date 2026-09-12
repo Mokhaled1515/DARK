@@ -27,7 +27,7 @@ app.use(
     origin: function (origin, callback) {
       // السماح بأي طلب جاي من Vercel أو localhost أثناء التطور
       const allowedOrigins = [
-        "https://dark-mo-o1.vercel.app",
+        "https://DARK — Real-Time Chat Application-mo-o1.vercel.app",
         "http://localhost:5173",
       ];
       if (
