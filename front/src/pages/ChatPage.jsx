@@ -51,22 +51,7 @@ function ChatPage() {
     unsubscribeFromFriendEvents,
   ]);
 
-  // useEffect(() => {
-  //   if (!activeConversationId) return;
-
-  //   subscribeToMessages(activeConversationId);
-  //   getMessages(activeConversationId);
-
-  //   return () => {
-  //     unsubscribeFromMessages();
-  //   };
-  // }, [
-  //   activeConversationId,
-  //   getMessages,
-  //   subscribeToMessages,
-  //   unsubscribeFromMessages,
-  // ]);
-
+  
   useEffect(() => {
     if (!activeConversationId) return;
     const socket = useAuthStore.getState().socket;

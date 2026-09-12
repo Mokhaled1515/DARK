@@ -209,7 +209,6 @@ function MessageBubble({ message, onImageClick }) {
             ))}
           </div>
 
-          {/* زر الحذف لو الرسالة بتاعتي (يظهر بشكل أيقونة دائرية جنب الإيموجيز بدل ما ياخد مساحة تحتها) */}
           {isMe && (
             <>
               <div className="h-4 w-[1px] bg-white/20 mx-0.5" />

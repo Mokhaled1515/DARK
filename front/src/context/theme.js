@@ -6,8 +6,7 @@ import {
 
 export const ThemeContext = createContext(null);
 
-// const PRESET_IDS = new Set(HERO_UI_THEME_PRESETS.map((p) => p.id));
-// ✅ الشكل الآمن 100%
+
 const safePresets = Array.isArray(HERO_UI_THEME_PRESETS)
   ? HERO_UI_THEME_PRESETS
   : [];

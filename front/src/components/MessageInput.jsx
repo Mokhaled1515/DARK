@@ -13,8 +13,6 @@ function MessageInput({ conversationId }) {
   const emojiPickerRef = useRef(null);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [pickerPosition, setPickerPosition] = useState({ top: 0, left: 0 });
-
-  // Zustand Store
   const composerText = useChatStore((state) => state.composerText);
   const setComposerText = useChatStore((state) => state.setComposerText);
   const sendTextMessage = useChatStore((state) => state.sendTextMessage);
@@ -24,12 +22,10 @@ function MessageInput({ conversationId }) {
   const sendTypingStatus = useChatStore((state) => state.sendTypingStatus);
   const selectedUser = useChatStore((state) => state.selectedUser);
 
-  // Voice Recording States
   const [isRecording, setIsRecording] = useState(false);
   const [audioBlob, setAudioBlob] = useState(null);
   const [recordingTime, setRecordingTime] = useState(0);
 
-  // 1. إضافة State خاصة بنسبة الرفع (Upload Progress)
   const [uploadProgress, setUploadProgress] = useState(0);
 
   const mediaRecorderRef = useRef(null);
@@ -37,7 +33,6 @@ function MessageInput({ conversationId }) {
   const timerRef = useRef(null);
   const typingTimeoutRef = useRef(null);
 
-  // حساب مكان الزر بدقة عند فتحه لكي يظهر فوقه مباشرة عبر Portal
   const toggleEmojiPicker = () => {
     if (!showEmojiPicker && emojiButtonRef.current) {
       const rect = emojiButtonRef.current.getBoundingClientRect();
@@ -49,7 +44,6 @@ function MessageInput({ conversationId }) {
     setShowEmojiPicker((prev) => !prev);
   };
 
-  // إغلاق نافذة الإيموجي عند النقر خارجها
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (
@@ -165,7 +159,6 @@ function MessageInput({ conversationId }) {
         type: "audio/mpeg",
       });
 
-      // محاكاة أو تفعيل الـ Progress للصوتيات أيضاً
       setUploadProgress(0);
       const progressInterval = setInterval(() => {
         setUploadProgress((prev) => (prev < 90 ? prev + 10 : prev));
@@ -198,7 +191,6 @@ function MessageInput({ conversationId }) {
     try {
       setUploadProgress(0);
 
-      // محاكاة تصاعد النسبة المئوية تدريجياً أثناء الرفع (يمكنك ربطها بـ Axios onUploadProgress لو متاح في الستور)
       const progressInterval = setInterval(() => {
         setUploadProgress((prev) => {
           if (prev >= 95) {
@@ -212,7 +204,6 @@ function MessageInput({ conversationId }) {
       await sendMediaMessage({
         conversationId,
         file,
-        // لو الستور عندك يدعم تمرير callback للـ progress يمكنك استخدامه هكذا:
         onUploadProgress: (progressEvent) => {
           const percentCompleted = Math.round(
             (progressEvent.loaded * 100) / progressEvent.total,
@@ -227,7 +218,6 @@ function MessageInput({ conversationId }) {
       console.error("فشل رفع الملف:", error);
     } finally {
       event.target.value = "";
-      // إعادة تعيين النسبة بعد انتهاء الختم بفترة قصيرة
       setTimeout(() => setUploadProgress(0), 500);
     }
   };
@@ -256,7 +246,6 @@ function MessageInput({ conversationId }) {
           document.body,
         )}
 
-      {/* 2. عرض نسبة الرفع بجانب النص المتحرك */}
       {isSendingMedia && (
         <div className="mx-auto mb-2 flex max-w-3xl items-center justify-center gap-2 rounded-xl bg-surface/80 py-2 text-xs text-muted">
           <span className="size-3 animate-spin rounded-full border-2 border-primary border-t-transparent" />

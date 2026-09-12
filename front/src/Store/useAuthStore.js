@@ -2,7 +2,6 @@ import { create } from "zustand";
 import { axiosInstance } from "../lib/axios.js";
 import { io } from "socket.io-client";
 import { useChatStore } from "./useChatStore.js";
-// import { useFriendStore } from "./useFriendStore";
 import toast from "react-hot-toast";
 import { useFriendStore } from "./useFriendStore";
 const baseURL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
@@ -45,24 +44,6 @@ export const useAuthStore = create((set, get) => ({
     get().disconnectSocket();
   },
 
-  // connectSocket: (user) => {
-  //   if (!user || get().socket?.connected) return;
-
-  //   const socket = io(baseURL, { query: { userId: user._id } });
-  //   set({ socket });
-
-  //   socket.on("getOnlineUsers", (userIds) => {
-  //     const safeUserIds = Array.isArray(userIds) ? userIds : [];
-  //     const stringifiedUserIds = safeUserIds.map((id) => String(id));
-  //     // console.log("Online users:", safeUserIds);
-  //     set({ onlineUsers: stringifiedUserIds });
-  //   });
-
-  //   socket.on("userOffline", ({ userId, lastSeen }) => {
-  //     useChatStore.getState().updateUserLastSeen?.(userId, lastSeen);
-  //   });
-  // },
-
   connectSocket: (user) => {
     if (!user || get().socket?.connected) return;
 
@@ -87,10 +68,6 @@ export const useAuthStore = create((set, get) => ({
     socket.on("userOffline", ({ userId, lastSeen }) => {
       useChatStore.getState().updateUserLastSeen?.(userId, lastSeen);
     });
-
-    // ==========================================
-    // FRIEND REQUEST REAL-TIME EVENTS
-    // ==========================================
 
     useFriendStore.getState().subscribeToFriendEvents();
   },

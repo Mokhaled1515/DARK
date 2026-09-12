@@ -8,7 +8,6 @@ function SettingsProfile() {
   const [fullName, setFullName] = useState(authUser?.fullName || "");
   const [selectedImg, setSelectedImg] = useState(null);
 
-  // التعامل مع اختيار صورة جديدة وتحويلها لـ Base64
   const handleImageUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -32,7 +31,6 @@ function SettingsProfile() {
     <div className="max-w-xl mx-auto p-6 bg-gray-900 rounded-2xl text-white shadow-xl mt-8">
       <h2 className="text-xl font-bold mb-6">Account Settings</h2>
 
-      {/* قسم تغيير الصورة الشخصية */}
       <div className="flex flex-col items-center mb-6">
         <div className="relative size-24 rounded-full overflow-hidden border-2 border-gray-700">
           <img
@@ -62,7 +60,6 @@ function SettingsProfile() {
         </p>
       </div>
 
-      {/* قسم تعديل الـ Nickname / Full Name */}
       <form onSubmit={handleUpdateName} className="space-y-4">
         <div>
           <label className="block text-sm text-gray-300 mb-1">Nickname / Full Name</label>

@@ -1,8 +1,8 @@
 import express from "express";
 import http from "http";
 import { Server } from "socket.io";
-import User from "../models/User.js"; // 👈 استدعِ model المستخدم
-import Message from "../models/Messege.js"; // 👈 1. أضفنا استدعاء الـ Message model هنا عشان المشاكل
+import User from "../models/User.js"; 
+import Message from "../models/Messege.js"; 
 
 const app = express();
 const server = http.createServer(app);
@@ -58,20 +58,15 @@ io.on("connection", (socket) => {
     socket.leave(groupId);
   });
 
-  // 🟢 تعديل حدث disconnect
   socket.on("disconnect", async () => {
     delete userSocketMap[userId];
 
-    // 1. إرسال قائمة المتصلين الجديدة
     io.emit("getOnlineUsers", Object.keys(userSocketMap));
 
-    // 2. تسجيل وقت الخروج الحالي
     const lastSeen = new Date();
 
-    // 3. إرسال حدث userOffline بالبيانات المحدثة لحظياً
     io.emit("userOffline", { userId, lastSeen });
 
-    // 4. تحديث الوقت في قاعدة البيانات
     try {
       if (userId) {
         await User.findByIdAndUpdate(userId, { lastSeen });
@@ -81,10 +76,8 @@ io.on("connection", (socket) => {
     }
   });
 
-  // 🟢 حدث قراءة الرسايل وتصفير العداد
   socket.on("markMessagesAsSeen", async ({ conversationId }) => {
     try {
-      // 1. تحديث الرسائل في قاعدة البيانات لتصبح مقروءة (isRead: true)
       await Message.updateMany(
         {
           $or: [
@@ -96,7 +89,6 @@ io.on("connection", (socket) => {
         { $set: { isRead: true } },
       );
 
-      // 2. إعلام الطرف الآخر (المرسل) أن رسائله تمت قراءتها
       socket
         .to(conversationId)
         .emit("messagesSeen", { conversationId, seenBy: userId });

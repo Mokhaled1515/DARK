@@ -8,7 +8,6 @@ cloudinary.config({
 });
 
 /**
- * دالة عامة لرفع أي ملف (صوت، صورة، فيديو) إلى Cloudinary
  * @param {Buffer} fileBuffer - بوفر الملف القادم من Multer
  * @param {string} folderName - اسم المجلد في Cloudinary
  * @returns {Promise<string>} - ينتهي بـ secure_url للملف المرفوع
@@ -18,7 +17,7 @@ export const uploadChatMedia = (fileBuffer, folderName = "chat_media") => {
     const stream = cloudinary.uploader.upload_stream(
       {
         folder: folderName,
-        resource_type: "auto", // 👈 يتعرف تلقائياً على الصوت، الفيديو، والصور
+        resource_type: "auto", 
       },
       (error, result) => {
         if (result) {

@@ -64,7 +64,6 @@ export async function acceptFriendRequest(req, res) {
     const { requestId } = req.params;
     const userId = req.user._id;
 
-    // 1. Get the request
     const request = await FriendRequest.findById(requestId);
 
     if (!request || request.receiver.toString() !== userId.toString()) {
@@ -76,7 +75,6 @@ export async function acceptFriendRequest(req, res) {
     const senderId = request.sender;
     const receiverId = request.receiver;
 
-    // 2. Add each user to the other's friends
     await User.findByIdAndUpdate(senderId, {
       $addToSet: {
         friends: receiverId,

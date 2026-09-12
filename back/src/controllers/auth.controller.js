@@ -13,30 +13,6 @@ export async function checkAuth(req, res) {
   }
 }
 
-// export async function searchUsers(req, res) {
-//   try {
-//     const { query } = req.query;
-//     const currentUserId = req.user._id;
-
-//     if (!query || query.trim() === "") {
-//       return res.status(200).json([]);
-//     }
-
-//     const users = await User.find({
-//       _id: { $ne: currentUserId },
-//       $or: [
-//         { fullName: { $regex: query, $options: "i" } },
-//         { email: { $regex: query, $options: "i" } },
-//       ],
-//     }).select("fullName profilePic email friends");
-
-//     res.status(200).json(users);
-//   } catch (error) {
-//     console.error("Error in searchUsers:", error.message);
-//     res.status(500).json({ message: "Internal server error" });
-//   }
-// }
-
 export async function searchUsers(req, res) {
   try {
     const { query } = req.query;
@@ -64,9 +40,7 @@ export async function searchUsers(req, res) {
       ],
     }).select("fullName profilePic email friends");
 
-    const currentUser = await User.findById(currentUserId).select(
-      "friends"
-    );
+    const currentUser = await User.findById(currentUserId).select("friends");
 
     const results = await Promise.all(
       users.map(async (user) => {
@@ -75,8 +49,7 @@ export async function searchUsers(req, res) {
         // =========================
 
         const areFriends = currentUser.friends.some(
-          (friendId) =>
-            friendId.toString() === user._id.toString()
+          (friendId) => friendId.toString() === user._id.toString(),
         );
 
         if (areFriends) {
@@ -114,10 +87,7 @@ export async function searchUsers(req, res) {
         // 3. Request sent by me
         // =========================
 
-        if (
-          request.sender.toString() ===
-          currentUserId.toString()
-        ) {
+        if (request.sender.toString() === currentUserId.toString()) {
           return {
             ...user.toObject(),
             relationship: "pending_sent",
@@ -134,7 +104,7 @@ export async function searchUsers(req, res) {
           relationship: "pending_received",
           requestId: request._id,
         };
-      })
+      }),
     );
 
     // =========================
@@ -142,16 +112,12 @@ export async function searchUsers(req, res) {
     // =========================
 
     const filteredResults = results.filter(
-      (user) => user.relationship !== "friends"
+      (user) => user.relationship !== "friends",
     );
 
     return res.status(200).json(filteredResults);
-
   } catch (error) {
-    console.error(
-      "Error in searchUsers:",
-      error.message
-    );
+    console.error("Error in searchUsers:", error.message);
 
     return res.status(500).json({
       message: "Internal server error",
@@ -216,7 +182,6 @@ export const toggleBlockUser = async (req, res) => {
         targetUserId,
       });
     } else {
-      // 🔒 إضافته لقائمة الحظر مع التاريخ الحالي
       await User.findByIdAndUpdate(userId, {
         $addToSet: {
           blockedUsers: {
@@ -260,7 +225,7 @@ export const updateProfile = async (req, res) => {
         ...(nickname && { nickname }),
         ...(uploadResponse && { profilePic: uploadResponse }),
       },
-      
+
       { returnDocument: "after" },
     );
 

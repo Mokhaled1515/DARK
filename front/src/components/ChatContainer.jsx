@@ -75,26 +75,6 @@ function ChatContainer() {
 
   const messagesRef = useScrollToBottom(activeConversationId, lastMessageId);
 
-  // useEffect(() => {
-  //   const convId = activeConversationId?._id || activeConversationId;
-  //   if (convId) {
-  //     markMessagesAsRead(convId);
-  //   }
-  // }, [activeConversationId, markMessagesAsRead]);
-
-  // useEffect(() => {
-  //   const peerId = activeConversation?.peer?._id || selectedUser?._id;
-
-  //   if (peerId) {
-  //     markMessagesAsRead(peerId);
-  //   }
-  // }, [
-  //   activeConversationId,
-  //   activeConversation?.peer?._id,
-  //   selectedUser?._id,
-  //   markMessagesAsRead,
-  // ]);
-
   if (!activeConversation) {
     return (
       <div className="flex flex-1 items-center justify-center p-4 text-center">
@@ -331,7 +311,7 @@ function ChatContainer() {
                     src={avatarSrc}
                     alt={peer.name}
                     className="size-full object-cover"
-                    onClick={() => setSelectedImage(avatarSrc)} // تكبير صورة البروفايل الجانبي أيضاً
+                    onClick={() => setSelectedImage(avatarSrc)} 
                   />
                 ) : (
                   peer.initials

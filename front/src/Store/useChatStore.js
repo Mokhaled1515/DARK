@@ -37,10 +37,7 @@ export const useChatStore = create(
       isSendingMedia: false,
       typingUsers: {},
 
-      // =========================================================
-      // USERS
-      // =========================================================
-
+    
       getUsers: async () => {
         set({ isUsersLoading: true });
 
@@ -67,10 +64,7 @@ export const useChatStore = create(
         }
       },
 
-      // =========================================================
-      // CONVERSATIONS
-      // =========================================================
-
+      
       getConversations: async () => {
         set({ isConversationsLoading: true });
 
@@ -95,36 +89,20 @@ export const useChatStore = create(
 
         const requestId = ++messagesRequestId;
 
-        console.log("🟡 getMessages START:", {
-          peerId,
-          activeConversationId: get().activeConversationId,
-          messagesCount: get().messages.length,
-        });
-
+       
         set({ isMessagesLoading: true });
 
         try {
           const res = await axiosInstance.get(`/messages/${peerId}`);
 
-          console.log("🟢 getMessages RESPONSE:", {
-            peerId,
-            responseCount: Array.isArray(res.data)
-              ? res.data.length
-              : "NOT_ARRAY",
-            activeConversationId: get().activeConversationId,
-          });
-
+        
           if (requestId !== messagesRequestId) {
-            console.log("🔴 OLD REQUEST IGNORED:", peerId);
             return;
           }
 
           const messages = Array.isArray(res.data) ? res.data : [];
 
-          console.log("🔵 SETTING MESSAGES:", {
-            peerId,
-            count: messages.length,
-          });
+       
 
           set({
             messages,
@@ -141,10 +119,6 @@ export const useChatStore = create(
           }
         }
       },
-
-      // =========================================================
-      // SEND MESSAGE
-      // =========================================================
 
       sendMessage: async (messageData) => {
         const { selectedUser } = get();
@@ -185,10 +159,7 @@ export const useChatStore = create(
         }
       },
 
-      // =========================================================
-      // SEND TEXT MESSAGE
-      // =========================================================
-
+    
       sendTextMessage: async () => {
         const messageText = get().composerText.trim();
 
@@ -244,10 +215,7 @@ export const useChatStore = create(
           set({ isSendingMedia: false });
         }
       },
-      // =========================================================
-      // SEND VOICE MESSAGE
-      // =========================================================
-
+   
       sendVoiceMessage: async (audioBlob) => {
         if (!audioBlob) return false;
 
@@ -264,10 +232,7 @@ export const useChatStore = create(
         }
       },
 
-      // =========================================================
-      // REACT TO MESSAGE
-      // =========================================================
-
+ 
       reactToMessage: async (messageId, emoji) => {
         try {
           const res = await axiosInstance.put(
@@ -291,10 +256,7 @@ export const useChatStore = create(
         }
       },
 
-      // =========================================================
-      // DELETE MESSAGE
-      // =========================================================
-
+      
       deleteMessage: async (messageId) => {
         try {
           await axiosInstance.delete(`/messages/${messageId}`);
@@ -313,10 +275,7 @@ export const useChatStore = create(
         }
       },
 
-      // =========================================================
-      // MARK MESSAGES AS READ
-      // =========================================================
-
+     
       markMessagesAsRead: async (peerId) => {
         if (!peerId) return;
 
@@ -340,31 +299,21 @@ export const useChatStore = create(
         }
       },
 
-      // =========================================================
-      // SOCKET - REAL TIME MESSAGES
-      // =========================================================
-
       subscribeToMessages: () => {
         const socket = useAuthStore.getState().socket;
 
         if (!socket) return;
 
-        // Prevent duplicate listeners
         socket.off("newMessage");
         socket.off("messageDeleted");
         socket.off("messageReacted");
         socket.off("messagesSeen");
-
-        // =======================================================
-        // NEW MESSAGE
-        // =======================================================
 
         socket.on("newMessage", (newMessage) => {
           const currentUserId = useAuthStore.getState().authUser?._id;
 
           if (!newMessage?.senderId) return;
 
-          // الرسالة دي جاية من الشخص الآخر فقط
           if (String(newMessage.senderId) === String(currentUserId)) {
             return;
           }
@@ -376,7 +325,6 @@ export const useChatStore = create(
               ? String(newMessage.conversationId)
               : null;
 
-            // activeConversationId لازم يكون Conversation ID
             const isCurrentConversation =
               incomingConversationId &&
               String(state.activeConversationId) === incomingConversationId;
@@ -410,8 +358,7 @@ export const useChatStore = create(
             return {
               conversations,
 
-              // لو الشات مفتوح بالفعل
-              // نضيف الرسالة مباشرة داخله
+          
               messages: isCurrentConversation
                 ? [...state.messages, newMessage]
                 : state.messages,
@@ -419,10 +366,7 @@ export const useChatStore = create(
           });
         });
 
-        // =======================================================
-        // MESSAGE DELETED
-        // =======================================================
-
+      
         socket.on("messageDeleted", (updatedMessage) => {
           const messageId = updatedMessage._id || updatedMessage.id;
 
@@ -433,10 +377,7 @@ export const useChatStore = create(
           }));
         });
 
-        // =======================================================
-        // MESSAGE REACTED
-        // =======================================================
-
+      
         socket.on("messageReacted", (updatedMessage) => {
           const messageId = updatedMessage._id || updatedMessage.id;
 
@@ -449,10 +390,7 @@ export const useChatStore = create(
           }));
         });
 
-        // =======================================================
-        // MESSAGES SEEN
-        // =======================================================
-
+     
         socket.on("messagesSeen", ({ conversationId }) => {
           set((state) => ({
             messages: state.messages.map((msg) =>
@@ -467,10 +405,7 @@ export const useChatStore = create(
         });
       },
 
-      // =========================================================
-      // UNSUBSCRIBE SOCKET
-      // =========================================================
-
+   
       unsubscribeFromMessages: () => {
         const socket = useAuthStore.getState().socket;
 
@@ -503,132 +438,34 @@ export const useChatStore = create(
           return;
         }
 
-        // نفتح الشات فورًا
-        // ولا نمسح الرسائل القديمة
+      
         set({
           activeConversationId: conversationId,
           selectedUser: peer,
           sidebarTab: "chats",
         });
 
-        // نحمل الرسائل الخاصة بالشخص
         await get().getMessages(peerId);
 
-        // نعلّمها كمقروءة
         await get().markMessagesAsRead(peerId);
       },
-      // openChatWithUser: async (user) => {
-      //   if (!user?._id) return;
-
-      //   const userId = String(user._id);
-
-      //   // نشوف هل فيه Conversation موجودة بالفعل
-      //   const existingConversation = get().conversations.find(
-      //     (conv) => String(getPeerId(conv)) === userId,
-      //   );
-
-      //   // لو موجودة، نفتحها بالطريقة العادية
-      //   if (existingConversation) {
-      //     await get().openConversation(existingConversation);
-      //     return;
-      //   }
-
-      //   // لو مفيش Conversation لسه
-      //   set({
-      //     selectedUser: user,
-      //     activeConversationId: userId,
-      //     sidebarTab: "chats",
-      //   });
-
-      //   // نحاول تحميل الرسائل
-      //   await get().getMessages(userId);
-
-      //   // نعمل تحديث لقائمة المحادثات
-      //   await get().getConversations();
-
-      //   // نشوف هل الـ conversation ظهرت بعد التحديث
-      //   const updatedConversation = get().conversations.find(
-      //     (conv) => String(getPeerId(conv)) === userId,
-      //   );
-
-      //   if (updatedConversation) {
-      //     await get().openConversation(updatedConversation);
-      //   }
-
-      //   // تعليم الرسائل كمقروءة
-      //   await get().markMessagesAsRead(userId);
-      // },
-
-      // openChatWithUser: async (user) => {
-      //   if (!user?._id) return;
-
-      //   const userId = String(user._id);
-
-      //   // 1. نشوف هل فيه Conversation موجودة بالفعل
-      //   const existingConversation = get().conversations.find(
-      //     (conv) => String(getPeerId(conv)) === userId,
-      //   );
-
-      //   // 2. لو موجودة، نفتحها بالطريقة العادية
-      //   if (existingConversation) {
-      //     await get().openConversation(existingConversation);
-      //     return;
-      //   }
-
-      //   // 3. مفيش Conversation لسه
-      //   // نعرض المستخدم مباشرة
-      //   set({
-      //     selectedUser: user,
-      //     activeConversationId: null,
-      //     sidebarTab: "chats",
-      //     messages: [],
-      //   });
-
-      //   // 4. نحاول تحميل الرسائل
-      //   await get().getMessages(userId);
-
-      //   // 5. نعمل تحديث لقائمة المحادثات
-      //   await get().getConversations();
-
-      //   // 6. نشوف هل Conversation ظهرت بعد التحديث
-      //   const updatedConversation = get().conversations.find(
-      //     (conv) => String(getPeerId(conv)) === userId,
-      //   );
-
-      //   // 7. لو ظهرت، نفتحها بالـ Conversation ID الحقيقي
-      //   if (updatedConversation) {
-      //     await get().openConversation(updatedConversation);
-      //   } else {
-      //     // لو مفيش Conversation، نفضل على المستخدم المختار
-      //     set({
-      //       selectedUser: user,
-      //       activeConversationId: null,
-      //       sidebarTab: "chats",
-      //     });
-      //   }
-
-      //   // 8. تعليم الرسائل كمقروءة
-      //   await get().markMessagesAsRead(userId);
-      // },
+     
 
       openChatWithUser: async (user) => {
   if (!user?._id) return;
 
   const userId = String(user._id);
 
-  // 1. نشوف هل فيه Conversation موجودة بالفعل
   const existingConversation = get().conversations.find(
     (conv) => String(getPeerId(conv)) === userId,
   );
 
-  // 2. لو موجودة، نفتحها بالطريقة العادية
   if (existingConversation) {
     await get().openConversation(existingConversation);
     return;
   }
 
-  // 3. مفيش Conversation لسه
-  // نعرض المستخدم مباشرة
+  
   set({
     selectedUser: user,
     activeConversationId: null,
@@ -636,22 +473,17 @@ export const useChatStore = create(
     messages: [],
   });
 
-  // 4. نحاول تحميل الرسائل
   await get().getMessages(userId);
 
-  // 5. نعمل تحديث لقائمة المحادثات
   await get().getConversations();
 
-  // 6. نشوف هل Conversation ظهرت بعد التحديث
   const updatedConversation = get().conversations.find(
     (conv) => String(getPeerId(conv)) === userId,
   );
 
-  // 7. لو ظهرت، نفتحها بالـ Conversation ID الحقيقي
   if (updatedConversation) {
     await get().openConversation(updatedConversation);
   } else {
-    // لو مفيش Conversation، نفضل على المستخدم المختار
     set({
       selectedUser: user,
       activeConversationId: null,
@@ -659,7 +491,6 @@ export const useChatStore = create(
     });
   }
 
-  // 8. تعليم الرسائل كمقروءة
   await get().markMessagesAsRead(userId);
 },
 
@@ -691,34 +522,19 @@ export const useChatStore = create(
         });
       },
 
-      // =========================================================
-      // SEARCH
-      // =========================================================
-
+      
       setSearchQuery: (searchQuery) => set({ searchQuery }),
 
-      // =========================================================
-      // SIDEBAR TAB
-      // =========================================================
-
+    
       setSidebarTab: (sidebarTab) => set({ sidebarTab }),
 
-      // =========================================================
-      // COMPOSER
-      // =========================================================
-
+     
       setComposerText: (composerText) => set({ composerText }),
 
-      // =========================================================
-      // SOUND
-      // =========================================================
-
+     
       setSoundEnabled: (isSoundEnabled) => set({ isSoundEnabled }),
 
-      // =========================================================
-      // TYPING STATUS
-      // =========================================================
-
+      
       sendTypingStatus: (receiverId, isTyping) => {
         const socket = useAuthStore.getState().socket;
 
@@ -728,10 +544,6 @@ export const useChatStore = create(
           receiverId,
         });
       },
-
-      // =========================================================
-      // BLOCK / UNBLOCK USER
-      // =========================================================
 
       toggleBlockUser: async (userId) => {
         try {

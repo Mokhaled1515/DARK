@@ -229,9 +229,7 @@ export const useFriendStore = create((set, get) => ({
         ),
       }));
 
-      /*
-       * بعد إزالة الصداقة، نحدث المحادثات.
-       */
+     
       await useChatStore.getState().getConversations();
 
       toast.success("Friend removed");

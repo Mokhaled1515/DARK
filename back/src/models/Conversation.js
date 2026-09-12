@@ -7,7 +7,6 @@ const conversationSchema = new mongoose.Schema(
       text: String,
       sender: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
     },
-    // 👈 أضف العدادات هنا لكل مستخدم في المحادثة
     unreadCounts: {
       type: Map,
       of: Number,

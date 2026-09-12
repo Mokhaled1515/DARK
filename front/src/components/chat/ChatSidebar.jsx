@@ -95,16 +95,12 @@ function ChatSidebar() {
     (state) => state.setActiveConversationId,
   );
 
-  // // const onlineUsers = useAuthAuthStoreSelector
-  // const onlineUsers = useAuthStore((state) => state.onlineUsers);
-  // const authUser = useAuthStore((state) => state.authUser);
   const onlineUsers = useAuthStore((state) => state.onlineUsers);
   const authUser = useAuthStore((state) => state.authUser);
   const socket = useAuthStore((state) => state.socket);
 
   const friends = useFriendStore((state) => state.friends);
-  // const pendingRequests = useFriendStore((state) => state.pendingRequests);
-  // const searchResults = useFriendStore((state) => state.searchResults);
+ 
   const pendingRequests = useFriendStore((state) => state.pendingRequests);
   const getPendingRequests = useFriendStore(
     (state) => state.getPendingRequests,
@@ -127,83 +123,25 @@ function ChatSidebar() {
     (state) => state.acceptFriendRequest,
   );
 
-  // const [sentRequests, setSentRequests] = useState([]);
   const sentRequests = useFriendStore((state) => state.sentRequests);
   const [loadingUserId, setLoadingUserId] = useState(null);
 
   const { activeConversationId, isLargeScreen } = useSelectedConversation();
 
-  // useEffect(() => {
-  //   const currentUserId = authUser?._id || authUser?.id;
-  //   if (currentUserId) {
-  //     getConversations();
-  //     getUsers();
-  //     subscribeToMessages(currentUserId);
-  //   }
-
-  //   return () => {
-  //     unsubscribeFromMessages();
-  //   };
-  // }, [
-  //   authUser,
-  //   getConversations,
-  //   getUsers,
-  //   subscribeToMessages,
-  //   unsubscribeFromMessages,
-  // ]);
-
-  // useEffect(() => {
-  //   const currentUserId = authUser?._id || authUser?.id;
-
-  //   if (!currentUserId) return;
-
-  //   // ==============================
-  //   // CHAT
-  //   // ==============================
-  //   getConversations();
-  //   getUsers();
-  //   subscribeToMessages();
-
-  //   // ==============================
-  //   // FRIEND REQUESTS
-  //   // ==============================
-  //   getPendingRequests();
-  //   subscribeToFriendEvents();
-
-  //   return () => {
-  //     unsubscribeFromMessages();
-  //     unsubscribeFromFriendEvents();
-  //   };
-  // }, [
-  //   authUser,
-  //   getConversations,
-  //   getUsers,
-  //   subscribeToMessages,
-  //   unsubscribeFromMessages,
-  //   getPendingRequests,
-  //   subscribeToFriendEvents,
-  //   unsubscribeFromFriendEvents,
-  // ]);
 
   useEffect(() => {
     const currentUserId = authUser?._id || authUser?.id;
 
     if (!currentUserId || !socket) return;
 
-    // ==============================
-    // CHAT DATA
-    // ==============================
+   
     getConversations();
     getUsers();
 
-    // ==============================
-    // FRIEND REQUESTS
-    // ==============================
+   
     getPendingRequests();
 
-    // ==============================
-    // SOCKET EVENTS
-    // ==============================
+   
     subscribeToMessages();
     subscribeToFriendEvents();
 
@@ -380,21 +318,14 @@ function ChatSidebar() {
               <UsersIcon className="size-3.5 opacity-80" aria-hidden />
               Friends
             </Tabs.Tab>
-            {/* <Tabs.Tab
-              id="add"
-              className="flex-1 justify-center gap-1.5 relative"
-            > */}
+          
             <Tabs.Tab
               id="add"
               className="relative flex-1 justify-center gap-1.5"
             >
               <UserPlusIcon className="size-3.5 opacity-80" aria-hidden />
               Add
-              {/* {pendingRequests.length > 0 && (
-                <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] text-white font-bold">
-                  {pendingRequests.length}
-                </span>
-              )} */}
+           
               {pendingRequests.length > 0 && (
                 <span
                   className="
@@ -487,7 +418,6 @@ function ChatSidebar() {
                   </div>
 
                   <div className="flex items-center gap-1.5">
-                    {/* Accept */}
                     <Button
                       size="sm"
                       isIconOnly
@@ -500,7 +430,6 @@ function ChatSidebar() {
                       <CheckIcon className="size-4" />
                     </Button>
 
-                    {/* Reject */}
                     <Button
                       size="sm"
                       isIconOnly
@@ -528,7 +457,6 @@ function ChatSidebar() {
               </p>
             ) : (
               searchResults.map((user) => {
-                // const isSent = sentRequests.includes(user._id);
                 const isFriend = friends.some(
                   (friend) => String(friend._id) === String(user._id),
                 );
@@ -549,7 +477,6 @@ function ChatSidebar() {
                     key={user._id}
                     className="flex items-center gap-3 rounded-xl border border-border bg-muted/10 p-2.5 transition-colors hover:bg-muted/20"
                   >
-                    {/* User Info */}
                     <div className="flex min-w-0 flex-1 items-center gap-3">
                       <Avatar
                         src={user?.profilePic}
@@ -570,7 +497,6 @@ function ChatSidebar() {
                       </div>
                     </div>
 
-                    {/* Add Button */}
                     <Button
                       size="sm"
                       variant={

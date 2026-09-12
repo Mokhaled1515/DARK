@@ -3,9 +3,6 @@ import Message from "../models/Messege.js";
 import Group from "../models/Group.js";
 import { v2 as cloudinary } from "cloudinary";
 import { uploadChatMedia } from "../lib/cloudinary.js";
-// import cloudinary from "../lib/cloudinary.js"; // تأكد من مسار الملف الصحيح حسب مشروعك
-// import { hasImageKitConfig, uploadChatMedia } from "../lib/imagekit.js";
-// import { uploadChatMedia } from "../lib/cloudinary.js";
 import { getReceiverSocketId, io } from "../lib/socket.js";
 import Conversation from "../models/Conversation.js";
 
@@ -25,53 +22,10 @@ export async function getUsersForSidebar(req, res) {
   }
 }
 
-// export async function getConversationForSidebar(req, res) {
-//   try {
-//     const loggedInUserId = req.user._id;
-//     const conversation = await Message.aggregate([
-//       {
-//         $match: {
-//           $or: [{ senderId: loggedInUserId }, { receiverId: loggedInUserId }],
-//           groupId: { $exists: false },
-//         },
-//       },
-//       {
-//         $group: {
-//           _id: {
-//             $cond: [
-//               { $eq: ["$senderId", loggedInUserId] },
-//               "$receiverId",
-//               "$senderId",
-//             ],
-//           },
-//           lastMessageAt: { $max: "$createdAt" },
-//         },
-//       },
-//       { $sort: { lastMessageAt: -1 } },
-//       {
-//         $lookup: {
-//           from: "users",
-//           localField: "_id",
-//           foreignField: "_id",
-//           as: "user",
-//         },
-//       },
-//       { $replaceRoot: { newRoot: { $first: "$user" } } },
-//       { $project: { clerkId: 0 } },
-//     ]);
-
-//     res.status(200).json(conversation);
-//   } catch (error) {
-//     console.error("Error in getConversationForSidebar:", error.message);
-//     res.status(500).json({ message: "Internal server error" });
-//   }
-// }
-
 export async function getConversationForSidebar(req, res) {
   try {
     const loggedInUserId = req.user._id;
 
-    // جلب المحادثات الخاصة بالمستخدم الحالي من جدول Conversation
     const conversations = await Conversation.find({
       participants: loggedInUserId,
     })
@@ -91,7 +45,6 @@ export async function getConversationForSidebar(req, res) {
 
         if (!otherUser) return null;
 
-        // جلب العداد الخاص بك من الـ Map
         const unreadCount =
           conv.unreadCounts?.get(loggedInUserId.toString()) || 0;
 
@@ -132,7 +85,6 @@ export async function getMessages(req, res) {
       }).sort({ createdAt: 1 });
     }
 
-    // 👈 تحويل الرسائل لتشمل imageUrl و audioUrl
     const formattedMessages = messages.map((msg) => ({
       ...msg.toObject(),
       imageUrl: msg.image || null,
@@ -175,7 +127,7 @@ export async function SendMessage(req, res) {
  
         originalName.startsWith("voice_") ||
         mime.startsWith("audio/") ||
-        mime === "video/webm" || // 👈 إضافة صيغة تسجيلات المتصفح webm
+        mime === "video/webm" || 
         url.endsWith(".webm") ||
         originalName.endsWith(".wav") ||
         originalName.endsWith(".mp3") ||
@@ -229,17 +181,7 @@ export async function SendMessage(req, res) {
 
     await conversation.save();
 
-    // بعد await conversation.save(); مباشرة:
-
-    // const receiverSocketId = getReceiverSocketId(receiverId);
-    // if (receiverSocketId) {
-    //   // بنبعث الرسالة الجديدة ومعاها الـ unreadCounts المحدثة لو حابب
-    //   io.to(receiverSocketId).emit("newMessage", {
-    //     message: newMessage, // أو الـ message اللي انبعثت
-    //     conversationId: conversation._id,
-    //     unreadCounts: Object.fromEntries(conversation.unreadCounts),
-    //   });
-    // }
+  
 
     const responsePayload = {
       ...newMessage.toObject(),
@@ -251,7 +193,6 @@ export async function SendMessage(req, res) {
     if (groupId) {
       io.to(groupId).emit("newGroupMessage", responsePayload);
     } else if (receiverId) {
-      // 👈 حساب عدد الرسائل غير المقروءة الموجهة للـ receiver من هذا الـ sender
       const unreadCount = await Message.countDocuments({
         senderId,
         receiverId,
@@ -259,13 +200,7 @@ export async function SendMessage(req, res) {
       });
 
       const receiverSocketId = getReceiverSocketId(receiverId);
-      // if (receiverSocketId) {
-      //   // نرسل الرسالة وبداخلها الـ unreadCount المحدث
-      //   io.to(receiverSocketId).emit("newMessage", {
-      //     ...responsePayload,
-      //     unreadCount,
-      //   });
-      // }
+     
       if (receiverSocketId) {
   io.to(receiverSocketId).emit("newMessage", {
     ...responsePayload,
@@ -287,13 +222,11 @@ export async function markMessagesAsRead(req, res) {
     const { id: senderId } = req.params;
     const myId = req.user._id;
 
-    // 1. تحديث الرسائل القديمة إلى isRead: true
     await Message.updateMany(
       { senderId: senderId, receiverId: myId, isRead: false },
       { $set: { isRead: true } },
     );
 
-    // 2. تصفير العداد في مستند المحادثة للمستخدم الحالي
     const conversation = await Conversation.findOne({
       participants: { $all: [senderId, myId] },
     });
@@ -302,7 +235,6 @@ export async function markMessagesAsRead(req, res) {
       conversation.unreadCounts.set(myId.toString(), 0);
       await conversation.save();
 
-      // 3. إشعار الطرف الآخر عبر السوكيت إن رسائله تمت قراءتها (اختياري لتحديث العلامات)
       const senderSocketId = getReceiverSocketId(senderId);
       if (senderSocketId) {
         io.to(senderSocketId).emit("messagesSeen", {
@@ -321,7 +253,7 @@ export async function markMessagesAsRead(req, res) {
 
 export const toggleReaction = async (req, res) => {
   try {
-    const { messageId } = req.params; // 👈 تعديل الاسم ليطابق الـ Route (:messageId)
+    const { messageId } = req.params; 
     const { emoji } = req.body;
     const userId = req.user._id;
 
@@ -330,26 +262,22 @@ export const toggleReaction = async (req, res) => {
       return res.status(404).json({ message: "Message not found" });
     }
 
-    // الفحص إذا كان المستخدم أضاف رياكشن سابقاً
     const existingReactionIndex = message.reactions.findIndex(
       (r) => r.userId.toString() === userId.toString(),
     );
 
     if (existingReactionIndex > -1) {
-      // لو ضغط على نفس الإيموجي بيلغيه، لو إيموجي تاني بيتعدل
       if (message.reactions[existingReactionIndex].emoji === emoji) {
         message.reactions.splice(existingReactionIndex, 1);
       } else {
         message.reactions[existingReactionIndex].emoji = emoji;
       }
     } else {
-      // إرسال رياكشن جديد
       message.reactions.push({ userId, emoji });
     }
 
     await message.save();
 
-    // إرسال التحديث عبر Socket.io للطرف الآخر
     const receiverId =
       message.senderId.toString() === userId.toString()
         ? message.receiverId
@@ -365,7 +293,6 @@ export const toggleReaction = async (req, res) => {
       }
     }
 
-    // إرجاع الرسالة محدثة للفرونت إند
     res.status(200).json(message);
   } catch (error) {
     console.error("Error in toggleReaction controller: ", error.message);
@@ -377,7 +304,7 @@ export const reactToMessage = async (req, res) => {
   try {
     const { id: messageId } = req.params;
     const { emoji } = req.body;
-    const userId = req.user._id; // جاي من الـ protectRoute middleware
+    const userId = req.user._id; 
 
     const message = await Message.findById(messageId);
     if (!message) {
@@ -390,20 +317,17 @@ export const reactToMessage = async (req, res) => {
     );
 
     if (existingReactionIndex > -1) {
-      // لو ضغط على نفس الإيموجي بيلغيه، لو إيموجي تاني بيتعدل
       if (message.reactions[existingReactionIndex].emoji === emoji) {
         message.reactions.splice(existingReactionIndex, 1);
       } else {
         message.reactions[existingReactionIndex].emoji = emoji;
       }
     } else {
-      // إرسال رياكشن جديد
       message.reactions.push({ userId, emoji });
     }
 
     await message.save();
 
-    // 👈 إرسال الحدث عبر Socket.io للطرف الآخر لحظياً
     const receiverSocketId = getReceiverSocketId(
       message.senderId.toString() === userId.toString()
         ? message.receiverId
@@ -416,7 +340,6 @@ export const reactToMessage = async (req, res) => {
       });
     }
 
-    // إرجاع الرسالة بعد التحديث للفرونت إند
     res.status(200).json(message);
   } catch (error) {
     console.log("Error in reactToMessage controller: ", error.message);
@@ -454,7 +377,6 @@ export const deleteMessage = async (req, res) => {
 
     await Message.findByIdAndDelete(messageId);
 
-    // 👈 إرسال كائن يحتوي على معرف الرسالة للطرف الآخر
     const receiverId = message.receiverId;
     if (receiverId) {
       const receiverSocketId = getReceiverSocketId(receiverId.toString());
